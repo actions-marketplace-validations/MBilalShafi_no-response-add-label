@@ -33,6 +33,12 @@ export default class Config {
   /** Name of the label to use for issues that need more information or clarification. */
   responseRequiredLabel: string
 
+  /** An optional label to add when the `responseRequiredLabel` gets removed due to issue author's reply */
+  optionalFollowUpLabel?: string
+
+  /** An optional label to add when the `responseRequiredLabel` gets removed due to issue author's reply */
+  optionalFollowUpLabelColor?: string
+
   /** GitHub token to use when performing API operations. */
   token: string
 
@@ -58,6 +64,10 @@ export default class Config {
     )
 
     this.token = core.getInput('token', { required: true })
+
+    this.optionalFollowUpLabel = core.getInput('optionalFollowUpLabel') || undefined
+
+    this.optionalFollowUpLabelColor = core.getInput('optionalFollowUpLabelColor') || undefined
   }
 
   valueOrDefault(value: string, defaultValue: string): string {

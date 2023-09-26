@@ -43,7 +43,7 @@ export default class NoResponse {
   async sweep(): Promise<void> {
     core.debug('Starting sweep')
 
-    await this.ensureLabelExists()
+    await this.ensureLabelExists(this.config.responseRequiredLabel, this.config.responseRequiredColor)
 
     const issues = await this.getCloseableIssues()
 
@@ -55,7 +55,7 @@ export default class NoResponse {
   async unmark(): Promise<void> {
     core.debug('Starting unmark')
 
-    const { responseRequiredLabel } = this.config
+    const { responseRequiredLabel, optionalFollowUpLabel, optionalFollowUpLabelColor } = this.config
     const payload: IssueCommentEvent = await this.readPayload()
     const owner = payload.repository.owner.login
     const repo = payload.repository.name
@@ -75,6 +75,17 @@ export default class NoResponse {
         issue_number: number,
         name: responseRequiredLabel
       })
+
+      await this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff')
+
+      if (optionalFollowUpLabel) {
+        await this.octokit.issues.addLabel({
+          owner,
+          repo,
+          issue_number: number,
+          label: optionalFollowUpLabel
+        })
+      }
 
       if (
         issueInfo.data.state === 'closed' &&
@@ -97,7 +108,7 @@ export default class NoResponse {
     await this.octokit.issues.update({ state: 'closed', ...issue })
   }
 
-  async ensureLabelExists(): Promise<void> {
+  async ensureLabelExists(name, color): Promise<void> {
     try {
       await this.octokit.issues.getLabel({
         name: this.config.responseRequiredLabel,
