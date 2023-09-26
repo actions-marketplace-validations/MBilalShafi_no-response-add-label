@@ -1,9 +1,8 @@
 import * as core from '@actions/core'
-
 import Config from './config'
 import NoResponse from './no-response'
 
-async function run(): Promise<void> {
+async function run (): Promise<void> {
   try {
     const eventName = process.env['GITHUB_EVENT_NAME']
 
@@ -17,7 +16,7 @@ async function run(): Promise<void> {
     } else {
       core.error(`Unrecognized event: ${eventName}`)
     }
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message)
   }
 }

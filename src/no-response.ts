@@ -31,13 +31,18 @@ interface RestIssue {
   number: number
 }
 
+interface Octokit extends InstanceType<typeof GitHub> {
+  issues: any
+  search: any
+}
+
 export default class NoResponse {
   config: Config
-  octokit: InstanceType<typeof GitHub>
+  octokit: Octokit
 
   constructor(config: Config) {
     this.config = config
-    this.octokit = github.getOctokit(this.config.token)
+    this.octokit = github.getOctokit(this.config.token) as Octokit
   }
 
   async sweep(): Promise<void> {
@@ -107,16 +112,16 @@ export default class NoResponse {
     await this.octokit.issues.update({ state: 'closed', ...issue })
   }
 
-  async ensureLabelExists(name, color): Promise<void> {
+  async ensureLabelExists(name: string, color: string): Promise<void> {
     try {
       await this.octokit.issues.getLabel({
-        name: this.config.responseRequiredLabel,
+        name,
         ...this.config.repo
       })
     } catch (e) {
       this.octokit.issues.createLabel({
-        name: this.config.responseRequiredLabel,
-        color: this.config.responseRequiredColor,
+        name,
+        color,
         ...this.config.repo
       })
     }
@@ -187,7 +192,7 @@ export default class NoResponse {
   async hasResponseRequiredLabel(issue: Issue): Promise<boolean> {
     const labels = await this.octokit.issues.listLabelsOnIssue({ ...issue })
 
-    return labels.data.map((label) => label.name).includes(this.config.responseRequiredLabel)
+    return labels.data.map((label: any) => label.name).includes(this.config.responseRequiredLabel)
   }
 
   async readPayload(): Promise<IssueCommentEvent> {
