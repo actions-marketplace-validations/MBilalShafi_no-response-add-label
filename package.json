@@ -1,6 +1,6 @@
 {
   "name": "no-response-add-label",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "description": "A GitHub Action that closes Issues where the author hasn't responded to a request for more information",
   "main": "dist/index.js",
