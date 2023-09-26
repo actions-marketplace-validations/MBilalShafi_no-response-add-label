@@ -76,9 +76,8 @@ export default class NoResponse {
         name: responseRequiredLabel
       })
 
-      await this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff')
-
       if (optionalFollowUpLabel) {
+        await this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff')
         await this.octokit.issues.addLabel({
           owner,
           repo,

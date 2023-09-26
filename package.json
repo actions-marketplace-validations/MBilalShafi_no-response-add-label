@@ -1,5 +1,5 @@
 {
-  "name": "no-response",
+  "name": "no-response-add-label",
   "version": "0.0.0",
   "private": true,
   "description": "A GitHub Action that closes Issues where the author hasn't responded to a request for more information",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lee-dohm/no-response.git"
+    "url": "git+https://github.com/MBilalShafi/no-response-add-label.git"
   },
   "keywords": [
     "actions",

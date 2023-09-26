@@ -1,4 +1,4 @@
-name: no-response
+name: no-response-add-label
 description: Closes Issues where the original author doesn't respond to a request for information
 inputs:
   closeComment:
@@ -18,6 +18,11 @@ inputs:
   responseRequiredLabel:
     description: Label indicating that a response from the original author is required
     default: more-information-needed
+  optionalFollowUpLabel:
+    description: Label that will be added after the required label will be removed
+  optionalFollowUpLabelColor:
+    description: Color for the `optionalFollowUpLabel`
+    default: ffffff
   token:
     description: Token to access the GitHub API
     required: true
