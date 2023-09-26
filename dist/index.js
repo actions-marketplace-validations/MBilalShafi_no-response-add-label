@@ -13360,11 +13360,11 @@ class NoResponse {
             const { number } = payload.issue;
             const comment = payload.comment;
             const issue = { owner, repo, issue_number: number };
-            const issueInfo = yield this.octokit.issues.get(issue);
+            const issueInfo = yield this.octokit.rest.issues.get(issue);
             const isMarked = yield this.hasResponseRequiredLabel(issue);
             if (isMarked && ((_a = issueInfo.data.user) === null || _a === void 0 ? void 0 : _a.login) === comment.user.login) {
                 core.info(`${owner}/${repo}#${number} is being unmarked`);
-                yield this.octokit.issues.removeLabel({
+                yield this.octokit.rest.issues.removeLabel({
                     owner,
                     repo,
                     issue_number: number,
@@ -13372,16 +13372,16 @@ class NoResponse {
                 });
                 if (optionalFollowUpLabel) {
                     yield this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff');
-                    yield this.octokit.issues.addLabel({
+                    yield this.octokit.rest.issues.addLabels({
                         owner,
                         repo,
                         issue_number: number,
-                        label: optionalFollowUpLabel
+                        labels: [optionalFollowUpLabel]
                     });
                 }
                 if (issueInfo.data.state === 'closed' &&
                     issueInfo.data.user.login !== ((_b = issueInfo.data.closed_by) === null || _b === void 0 ? void 0 : _b.login)) {
-                    this.octokit.issues.update({ owner, repo, issue_number: number, state: 'open' });
+                    this.octokit.rest.issues.update({ owner, repo, issue_number: number, state: 'open' });
                 }
             }
         });
@@ -13391,18 +13391,18 @@ class NoResponse {
             const { closeComment } = this.config;
             core.info(`${issue.owner}/${issue.repo}#${issue.issue_number} is being closed`);
             if (closeComment) {
-                yield this.octokit.issues.createComment(Object.assign({ body: closeComment }, issue));
+                yield this.octokit.rest.issues.createComment(Object.assign({ body: closeComment }, issue));
             }
-            yield this.octokit.issues.update(Object.assign({ state: 'closed' }, issue));
+            yield this.octokit.rest.issues.update(Object.assign({ state: 'closed' }, issue));
         });
     }
     ensureLabelExists(name, color) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield this.octokit.issues.getLabel(Object.assign({ name }, this.config.repo));
+                yield this.octokit.rest.issues.getLabel(Object.assign({ name }, this.config.repo));
             }
             catch (e) {
-                this.octokit.issues.createLabel(Object.assign({ name,
+                this.octokit.rest.issues.createLabel(Object.assign({ name,
                     color }, this.config.repo));
             }
         });
@@ -13410,7 +13410,7 @@ class NoResponse {
     findLastLabeledEvent(issue) {
         return __awaiter(this, void 0, void 0, function* () {
             const { responseRequiredLabel } = this.config;
-            const events = yield this.octokit.paginate((yield this.octokit.issues.listEvents(Object.assign(Object.assign({}, issue), { per_page: 100 }))));
+            const events = yield this.octokit.paginate((yield this.octokit.rest.issues.listEvents(Object.assign(Object.assign({}, issue), { per_page: 100 }))));
             return events
                 .reverse()
                 .find((event) => event.event === 'labeled' && event.label.name === responseRequiredLabel);
@@ -13422,7 +13422,7 @@ class NoResponse {
             const { daysUntilClose, responseRequiredLabel } = this.config;
             const q = `repo:${owner}/${repo} is:issue is:open label:"${responseRequiredLabel}"`;
             const labeledEarlierThan = this.since(daysUntilClose);
-            const issues = yield this.octokit.search.issuesAndPullRequests({
+            const issues = yield this.octokit.rest.search.issuesAndPullRequests({
                 q,
                 sort: 'updated',
                 order: 'asc',
@@ -13450,7 +13450,7 @@ class NoResponse {
     }
     hasResponseRequiredLabel(issue) {
         return __awaiter(this, void 0, void 0, function* () {
-            const labels = yield this.octokit.issues.listLabelsOnIssue(Object.assign({}, issue));
+            const labels = yield this.octokit.rest.issues.listLabelsOnIssue(Object.assign({}, issue));
             return labels.data.map((label) => label.name).includes(this.config.responseRequiredLabel);
         });
     }
