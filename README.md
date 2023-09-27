@@ -1,7 +1,9 @@
-# No Response
+# No response with add back a label
 
 A GitHub Action that closes Issues where the author hasn't responded to a request for more information.
-It also optionally adds back a 
+
+It was forked from https://github.com/lee-dohm/no-response
+On top of the functionality offered in the original action, this one also adds back a label on the removal of the `responseRequiredLabel`
 
 ## Use
 
