@@ -43,13 +43,23 @@ export default class NoResponse {
   async sweep(): Promise<void> {
     core.debug('Starting sweep')
 
-    await this.ensureLabelExists(this.config.responseRequiredLabel, this.config.responseRequiredColor)
+    await this.ensureLabelExists(
+      this.config.responseRequiredLabel,
+      this.config.responseRequiredColor
+    )
 
     const issues = await this.getCloseableIssues()
 
     for (const issue of issues) {
       this.close({ issue_number: issue.number, ...this.config.repo })
     }
+  }
+
+  async removeLabels(): Promise<void> {
+    core.debug('Starting removeLabels')
+    // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
+    const payload = await this.readPayload()
+    core.debug(`${payload.comment.body} = payload.comment.body`)
   }
 
   async unmark(): Promise<void> {
@@ -77,7 +87,7 @@ export default class NoResponse {
       })
 
       if (optionalFollowUpLabel) {
-        await this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff')
+        await this.ensureLabelExists(optionalFollowUpLabel, optionalFollowUpLabelColor || 'ffffff')
         await this.octokit.rest.issues.addLabels({
           owner,
           repo,

@@ -13276,6 +13276,9 @@ function run() {
             else if (eventName === 'issue_comment') {
                 noResponse.unmark();
             }
+            else if (eventName === 'issue_closed') {
+                noResponse.removeLabels();
+            }
             else {
                 core.error(`Unrecognized event: ${eventName}`);
             }
@@ -13349,6 +13352,14 @@ class NoResponse {
             }
         });
     }
+    removeLabels() {
+        return __awaiter(this, void 0, void 0, function* () {
+            core.debug('Starting removeLabels');
+            // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
+            const payload = yield this.readPayload();
+            core.debug(`${payload.comment.body} = payload.comment.body`);
+        });
+    }
     unmark() {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
@@ -13371,7 +13382,7 @@ class NoResponse {
                     name: responseRequiredLabel
                 });
                 if (optionalFollowUpLabel) {
-                    yield this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff');
+                    yield this.ensureLabelExists(optionalFollowUpLabel, optionalFollowUpLabelColor || 'ffffff');
                     yield this.octokit.rest.issues.addLabels({
                         owner,
                         repo,

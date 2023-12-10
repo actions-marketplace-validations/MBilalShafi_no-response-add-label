@@ -13,6 +13,8 @@ async function run (): Promise<void> {
       noResponse.sweep()
     } else if (eventName === 'issue_comment') {
       noResponse.unmark()
+    } else if (eventName === 'issue_closed') {
+      noResponse.removeLabels()
     } else {
       core.error(`Unrecognized event: ${eventName}`)
     }
