@@ -14,6 +14,7 @@ async function run(): Promise<void> {
     } else if (eventName === 'issue_comment') {
       noResponse.unmark()
     } else if (eventName === 'issues') {
+      core.info('Starting removeLabels')
       noResponse.removeLabels()
     } else {
       core.error(`Unrecognized event: ${eventName} test`)

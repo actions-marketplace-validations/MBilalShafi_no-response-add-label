@@ -13277,6 +13277,7 @@ function run() {
                 noResponse.unmark();
             }
             else if (eventName === 'issues') {
+                core.info('Starting removeLabels');
                 noResponse.removeLabels();
             }
             else {
