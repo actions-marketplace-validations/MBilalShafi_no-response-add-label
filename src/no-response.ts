@@ -57,13 +57,10 @@ export default class NoResponse {
 
   async removeLabels(): Promise<void> {
     core.debug('Starting removeLabels')
+
     // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
     const payload = await this.readIssuesPayload()
     core.debug(`${JSON.stringify(payload)} = payload`)
-  }
-
-  test(): void {
-    core.debug('Just a test')
   }
 
   async unmark(): Promise<void> {

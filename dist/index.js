@@ -13262,6 +13262,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
 const config_1 = __importDefault(__nccwpck_require__(6373));
 const no_response_1 = __importDefault(__nccwpck_require__(8908));
 function run() {
@@ -13277,7 +13278,9 @@ function run() {
                 noResponse.unmark();
             }
             else if (eventName === 'issues') {
-                return noResponse.test();
+                const payload = JSON.stringify(github.context.payload, undefined, 2);
+                console.log(`The event payload: ${payload}`);
+                noResponse.removeLabels();
             }
             else {
                 core.error(`Unrecognized event: ${eventName} test`);
@@ -13359,9 +13362,6 @@ class NoResponse {
             const payload = yield this.readIssuesPayload();
             core.debug(`${JSON.stringify(payload)} = payload`);
         });
-    }
-    test() {
-        core.debug('Just a test');
     }
     unmark() {
         var _a, _b;
