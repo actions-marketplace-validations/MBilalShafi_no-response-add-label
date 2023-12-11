@@ -13276,11 +13276,11 @@ function run() {
             else if (eventName === 'issue_comment') {
                 noResponse.unmark();
             }
-            else if (eventName === 'issue_closed') {
+            else if (eventName === 'issues') {
                 noResponse.removeLabels();
             }
             else {
-                core.error(`Unrecognized event: ${eventName}`);
+                core.error(`Unrecognized event: ${eventName} test`);
             }
         }
         catch (error) {
@@ -13356,8 +13356,8 @@ class NoResponse {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug('Starting removeLabels');
             // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
-            const payload = yield this.readPayload();
-            core.debug(`${payload.comment.body} = payload.comment.body`);
+            const payload = yield this.readIssuesPayload();
+            core.debug(`${JSON.stringify(payload)} = payload`);
         });
     }
     unmark() {
@@ -13466,6 +13466,15 @@ class NoResponse {
         });
     }
     readPayload() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!process.env.GITHUB_EVENT_PATH) {
+                throw new Error('GITHUB_EVENT_PATH is not defined');
+            }
+            const text = (yield fsp.readFile(process.env.GITHUB_EVENT_PATH)).toString();
+            return JSON.parse(text);
+        });
+    }
+    readIssuesPayload() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!process.env.GITHUB_EVENT_PATH) {
                 throw new Error('GITHUB_EVENT_PATH is not defined');
