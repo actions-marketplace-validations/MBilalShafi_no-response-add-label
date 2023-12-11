@@ -7,7 +7,7 @@ import Config from './config'
 import { GitHub } from '@actions/github/lib/utils'
 
 /* eslint-disable import/no-unresolved, import/named */
-import { IssueCommentEvent } from '@octokit/webhooks-types'
+import { IssueCommentEvent, IssuesEvent } from '@octokit/webhooks-types'
 import { RequestInterface } from '@octokit/types'
 /* eslint-enable */
 
@@ -58,8 +58,8 @@ export default class NoResponse {
   async removeLabels(): Promise<void> {
     core.debug('Starting removeLabels')
     // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
-    const payload = await this.readPayload()
-    core.debug(`${payload.comment.body} = payload.comment.body`)
+    const payload = await this.readIssuesPayload()
+    core.debug(`${JSON.stringify(payload)} = payload`)
   }
 
   async unmark(): Promise<void> {
@@ -201,6 +201,16 @@ export default class NoResponse {
   }
 
   async readPayload(): Promise<IssueCommentEvent> {
+    if (!process.env.GITHUB_EVENT_PATH) {
+      throw new Error('GITHUB_EVENT_PATH is not defined')
+    }
+
+    const text = (await fsp.readFile(process.env.GITHUB_EVENT_PATH)).toString()
+
+    return JSON.parse(text)
+  }
+
+  async readIssuesPayload(): Promise<IssuesEvent> {
     if (!process.env.GITHUB_EVENT_PATH) {
       throw new Error('GITHUB_EVENT_PATH is not defined')
     }
