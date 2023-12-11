@@ -12,9 +12,11 @@ Recommended basic configuration:
 ```yaml
 name: No Response
 
-# Both `issue_comment` and `scheduled` event types are required for this Action
+# `issues`.`closed`, `issue_comment`.`created`, and `scheduled` event types are required for this Action
 # to work properly.
 on:
+  issues:
+    types: [closed]
   issue_comment:
     types: [created]
   schedule:
@@ -25,7 +27,7 @@ jobs:
   noResponse:
     runs-on: ubuntu-latest
     steps:
-      - uses: MBilalShafi/no-response@v0.0.4
+      - uses: MBilalShafi/no-response@v0.0.6
         with:
           token: ${{ github.token }}
 ```
@@ -50,7 +52,7 @@ jobs:
   noResponse:
     runs-on: ubuntu-latest
     steps:
-      - uses: MBilalShafi/no-response@v0.0.4
+      - uses: MBilalShafi/no-response@v0.0.6
         with:
           token: ${{ github.token }}
           # auto close issues with no response from author for 7 days

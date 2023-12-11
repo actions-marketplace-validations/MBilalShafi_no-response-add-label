@@ -8,7 +8,6 @@ async function run(): Promise<void> {
 
     const config = new Config()
     const noResponse = new NoResponse(config)
-
     if (eventName === 'schedule') {
       noResponse.sweep()
     } else if (eventName === 'issue_comment') {

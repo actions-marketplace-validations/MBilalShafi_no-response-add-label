@@ -13355,7 +13355,7 @@ class NoResponse {
     removeLabels() {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug('Starting removeLabels');
-            const { optionalFollowUpLabel } = this.config;
+            const { optionalFollowUpLabel, responseRequiredLabel } = this.config;
             if (!optionalFollowUpLabel) {
                 return;
             }
@@ -13370,7 +13370,16 @@ class NoResponse {
             // if the issue closed by the issue author, check if optionalFollowUpLabel is present on the issue and then remove it
             if (payload.action === 'closed' && payload.issue.user.login === payload.sender.login) {
                 const labels = yield this.octokit.rest.issues.listLabelsOnIssue(issue);
-                if (labels.data.map((label) => label.name).includes(optionalFollowUpLabel)) {
+                const plainLabels = labels.data.map((label) => label.name);
+                if (plainLabels.includes(responseRequiredLabel)) {
+                    yield this.octokit.rest.issues.removeLabel({
+                        owner,
+                        repo,
+                        issue_number: number,
+                        name: responseRequiredLabel
+                    });
+                }
+                if (plainLabels.includes(optionalFollowUpLabel)) {
                     yield this.octokit.rest.issues.removeLabel({
                         owner,
                         repo,
