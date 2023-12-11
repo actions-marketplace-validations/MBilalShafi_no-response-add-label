@@ -35,9 +35,11 @@ Another example with further configurations:
 ```yaml
 name: No Response
 
-# Both `issue_comment` and `scheduled` event types are required for this Action
+# `issues`.`closed`, `issue_comment`.`created`, and `scheduled` event types are required for this Action
 # to work properly.
 on:
+  issues:
+    types: [closed]
   issue_comment:
     types: [created]
   schedule:
@@ -127,6 +129,16 @@ It will:
 1. Remove the `responseRequiredLabel`
 2. Reopen the issue if it was closed by someone other than the original author of the issue
 3. If `optionalFollowupLabel` is passed in the config, add it to the issue
+
+### `issues` Event
+
+When an `issues` event is received, if all of the following are true:
+
+- The issue was closed (i.e. `action: closed`)
+- The user which closed the issue is the same as the original author of the issue
+- The `optionalFollowupLabel` is passed in the config, and added as a label to the issue
+
+It will remove the `optionalFollowupLabel`
 
 ## License
 
