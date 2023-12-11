@@ -13270,6 +13270,7 @@ function run() {
             const eventName = process.env['GITHUB_EVENT_NAME'];
             const config = new config_1.default();
             const noResponse = new no_response_1.default(config);
+            console.log(eventName, 'eventName');
             if (eventName === 'schedule') {
                 noResponse.sweep();
             }
