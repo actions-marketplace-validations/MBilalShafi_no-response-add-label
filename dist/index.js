@@ -13361,7 +13361,7 @@ class NoResponse {
         });
     }
     test() {
-        core.error('Just a test');
+        core.debug('Just a test');
     }
     unmark() {
         var _a, _b;
