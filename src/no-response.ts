@@ -58,9 +58,32 @@ export default class NoResponse {
   async removeLabels(): Promise<void> {
     core.debug('Starting removeLabels')
 
-    // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
-    const payload = await this.readIssuesPayload()
-    core.debug(`${JSON.stringify(payload)} = payload`)
+    const { optionalFollowUpLabel } = this.config
+    if (!optionalFollowUpLabel) {
+      return
+    }
+    const payload = github.context.payload as IssuesEvent
+    if (payload.action !== 'closed') {
+      return
+    }
+    const owner = payload.repository.owner.login
+    const repo = payload.repository.name
+    const { number } = payload.issue
+    const issue = { owner, repo, issue_number: number }
+
+    // if the issue closed by the issue author, check if optionalFollowUpLabel is present on the issue and then remove it
+    if (payload.action === 'closed' && payload.issue.user.login === payload.sender.login) {
+      const labels = await this.octokit.rest.issues.listLabelsOnIssue(issue)
+
+      if (labels.data.map((label: any) => label.name).includes(optionalFollowUpLabel)) {
+        await this.octokit.rest.issues.removeLabel({
+          owner,
+          repo,
+          issue_number: number,
+          name: optionalFollowUpLabel
+        })
+      }
+    }
   }
 
   async unmark(): Promise<void> {

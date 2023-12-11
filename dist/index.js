@@ -13262,7 +13262,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
 const config_1 = __importDefault(__nccwpck_require__(6373));
 const no_response_1 = __importDefault(__nccwpck_require__(8908));
 function run() {
@@ -13278,8 +13277,6 @@ function run() {
                 noResponse.unmark();
             }
             else if (eventName === 'issues') {
-                const payload = JSON.stringify(github.context.payload, undefined, 2);
-                console.log(`The event payload: ${payload}`);
                 noResponse.removeLabels();
             }
             else {
@@ -13358,9 +13355,30 @@ class NoResponse {
     removeLabels() {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug('Starting removeLabels');
-            // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
-            const payload = yield this.readIssuesPayload();
-            core.debug(`${JSON.stringify(payload)} = payload`);
+            const { optionalFollowUpLabel } = this.config;
+            if (!optionalFollowUpLabel) {
+                return;
+            }
+            const payload = github.context.payload;
+            if (payload.action !== 'closed') {
+                return;
+            }
+            const owner = payload.repository.owner.login;
+            const repo = payload.repository.name;
+            const { number } = payload.issue;
+            const issue = { owner, repo, issue_number: number };
+            // if the issue closed by the issue author, check if optionalFollowUpLabel is present on the issue and then remove it
+            if (payload.action === 'closed' && payload.issue.user.login === payload.sender.login) {
+                const labels = yield this.octokit.rest.issues.listLabelsOnIssue(issue);
+                if (labels.data.map((label) => label.name).includes(optionalFollowUpLabel)) {
+                    yield this.octokit.rest.issues.removeLabel({
+                        owner,
+                        repo,
+                        issue_number: number,
+                        name: optionalFollowUpLabel
+                    });
+                }
+            }
         });
     }
     unmark() {

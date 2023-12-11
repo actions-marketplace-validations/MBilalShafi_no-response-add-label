@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
 import Config from './config'
 import NoResponse from './no-response'
 
@@ -15,8 +14,6 @@ async function run(): Promise<void> {
     } else if (eventName === 'issue_comment') {
       noResponse.unmark()
     } else if (eventName === 'issues') {
-      const payload = JSON.stringify(github.context.payload, undefined, 2)
-      console.log(`The event payload: ${payload}`)
       noResponse.removeLabels()
     } else {
       core.error(`Unrecognized event: ${eventName} test`)
