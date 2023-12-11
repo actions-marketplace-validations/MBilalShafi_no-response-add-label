@@ -7,8 +7,8 @@ import Config from './config'
 import { GitHub } from '@actions/github/lib/utils'
 
 /* eslint-disable import/no-unresolved, import/named */
-import { IssueCommentEvent } from '@octokit/webhooks-types'
 import { RequestInterface } from '@octokit/types'
+import { IssueCommentEvent, IssuesEvent } from '@octokit/webhooks-types'
 /* eslint-enable */
 
 const fsp = fs.promises
@@ -43,12 +43,46 @@ export default class NoResponse {
   async sweep(): Promise<void> {
     core.debug('Starting sweep')
 
-    await this.ensureLabelExists(this.config.responseRequiredLabel, this.config.responseRequiredColor)
+    await this.ensureLabelExists(
+      this.config.responseRequiredLabel,
+      this.config.responseRequiredColor
+    )
 
     const issues = await this.getCloseableIssues()
 
     for (const issue of issues) {
       this.close({ issue_number: issue.number, ...this.config.repo })
+    }
+  }
+
+  async removeLabels(): Promise<void> {
+    core.debug('Starting removeLabels')
+
+    const { optionalFollowUpLabel } = this.config
+    if (!optionalFollowUpLabel) {
+      return
+    }
+    const payload = github.context.payload as IssuesEvent
+    if (payload.action !== 'closed') {
+      return
+    }
+    const owner = payload.repository.owner.login
+    const repo = payload.repository.name
+    const { number } = payload.issue
+    const issue = { owner, repo, issue_number: number }
+
+    // if the issue closed by the issue author, check if optionalFollowUpLabel is present on the issue and then remove it
+    if (payload.action === 'closed' && payload.issue.user.login === payload.sender.login) {
+      const labels = await this.octokit.rest.issues.listLabelsOnIssue(issue)
+
+      if (labels.data.map((label: any) => label.name).includes(optionalFollowUpLabel)) {
+        await this.octokit.rest.issues.removeLabel({
+          owner,
+          repo,
+          issue_number: number,
+          name: optionalFollowUpLabel
+        })
+      }
     }
   }
 
@@ -77,7 +111,7 @@ export default class NoResponse {
       })
 
       if (optionalFollowUpLabel) {
-        await this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff')
+        await this.ensureLabelExists(optionalFollowUpLabel, optionalFollowUpLabelColor || 'ffffff')
         await this.octokit.rest.issues.addLabels({
           owner,
           repo,

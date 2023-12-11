@@ -13276,6 +13276,9 @@ function run() {
             else if (eventName === 'issue_comment') {
                 noResponse.unmark();
             }
+            else if (eventName === 'issues') {
+                noResponse.removeLabels();
+            }
             else {
                 core.error(`Unrecognized event: ${eventName}`);
             }
@@ -13349,6 +13352,35 @@ class NoResponse {
             }
         });
     }
+    removeLabels() {
+        return __awaiter(this, void 0, void 0, function* () {
+            core.debug('Starting removeLabels');
+            const { optionalFollowUpLabel } = this.config;
+            if (!optionalFollowUpLabel) {
+                return;
+            }
+            const payload = github.context.payload;
+            if (payload.action !== 'closed') {
+                return;
+            }
+            const owner = payload.repository.owner.login;
+            const repo = payload.repository.name;
+            const { number } = payload.issue;
+            const issue = { owner, repo, issue_number: number };
+            // if the issue closed by the issue author, check if optionalFollowUpLabel is present on the issue and then remove it
+            if (payload.action === 'closed' && payload.issue.user.login === payload.sender.login) {
+                const labels = yield this.octokit.rest.issues.listLabelsOnIssue(issue);
+                if (labels.data.map((label) => label.name).includes(optionalFollowUpLabel)) {
+                    yield this.octokit.rest.issues.removeLabel({
+                        owner,
+                        repo,
+                        issue_number: number,
+                        name: optionalFollowUpLabel
+                    });
+                }
+            }
+        });
+    }
     unmark() {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
@@ -13371,7 +13403,7 @@ class NoResponse {
                     name: responseRequiredLabel
                 });
                 if (optionalFollowUpLabel) {
-                    yield this.ensureLabelExists(optionalFollowUpLabel, this.config.optionalFollowUpLabelColor || 'ffffff');
+                    yield this.ensureLabelExists(optionalFollowUpLabel, optionalFollowUpLabelColor || 'ffffff');
                     yield this.octokit.rest.issues.addLabels({
                         owner,
                         repo,
