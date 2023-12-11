@@ -13277,7 +13277,7 @@ function run() {
                 noResponse.unmark();
             }
             else if (eventName === 'issues') {
-                noResponse.test();
+                return noResponse.test();
             }
             else {
                 core.error(`Unrecognized event: ${eventName} test`);
@@ -13361,7 +13361,7 @@ class NoResponse {
         });
     }
     test() {
-        core.debug('Just a test');
+        core.error('Just a test');
     }
     unmark() {
         var _a, _b;

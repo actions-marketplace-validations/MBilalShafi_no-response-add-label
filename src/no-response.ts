@@ -63,7 +63,7 @@ export default class NoResponse {
   }
 
   test(): void {
-    core.debug('Just a test')
+    core.error('Just a test')
   }
 
   async unmark(): Promise<void> {
