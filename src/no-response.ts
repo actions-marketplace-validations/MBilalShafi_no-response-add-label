@@ -7,8 +7,8 @@ import Config from './config'
 import { GitHub } from '@actions/github/lib/utils'
 
 /* eslint-disable import/no-unresolved, import/named */
-import { IssueCommentEvent, IssuesEvent } from '@octokit/webhooks-types'
 import { RequestInterface } from '@octokit/types'
+import { IssueCommentEvent, IssuesEvent } from '@octokit/webhooks-types'
 /* eslint-enable */
 
 const fsp = fs.promises
@@ -60,6 +60,10 @@ export default class NoResponse {
     // const { responseRequiredLabel, optionalFollowUpLabel } = this.config
     const payload = await this.readIssuesPayload()
     core.debug(`${JSON.stringify(payload)} = payload`)
+  }
+
+  test(): void {
+    core.debug('Just a test')
   }
 
   async unmark(): Promise<void> {

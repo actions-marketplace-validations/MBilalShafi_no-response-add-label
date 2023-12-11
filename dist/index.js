@@ -13277,8 +13277,7 @@ function run() {
                 noResponse.unmark();
             }
             else if (eventName === 'issues') {
-                core.info('Starting removeLabels');
-                noResponse.removeLabels();
+                noResponse.test();
             }
             else {
                 core.error(`Unrecognized event: ${eventName} test`);
@@ -13360,6 +13359,9 @@ class NoResponse {
             const payload = yield this.readIssuesPayload();
             core.debug(`${JSON.stringify(payload)} = payload`);
         });
+    }
+    test() {
+        core.debug('Just a test');
     }
     unmark() {
         var _a, _b;
