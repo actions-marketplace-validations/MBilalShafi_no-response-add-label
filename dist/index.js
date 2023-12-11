@@ -13280,7 +13280,7 @@ function run() {
                 noResponse.removeLabels();
             }
             else {
-                core.error(`Unrecognized event: ${eventName} test`);
+                core.error(`Unrecognized event: ${eventName}`);
             }
         }
         catch (error) {
@@ -13487,15 +13487,6 @@ class NoResponse {
         });
     }
     readPayload() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!process.env.GITHUB_EVENT_PATH) {
-                throw new Error('GITHUB_EVENT_PATH is not defined');
-            }
-            const text = (yield fsp.readFile(process.env.GITHUB_EVENT_PATH)).toString();
-            return JSON.parse(text);
-        });
-    }
-    readIssuesPayload() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!process.env.GITHUB_EVENT_PATH) {
                 throw new Error('GITHUB_EVENT_PATH is not defined');

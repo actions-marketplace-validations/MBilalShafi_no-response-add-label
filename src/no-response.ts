@@ -234,16 +234,6 @@ export default class NoResponse {
     return JSON.parse(text)
   }
 
-  async readIssuesPayload(): Promise<IssuesEvent> {
-    if (!process.env.GITHUB_EVENT_PATH) {
-      throw new Error('GITHUB_EVENT_PATH is not defined')
-    }
-
-    const text = (await fsp.readFile(process.env.GITHUB_EVENT_PATH)).toString()
-
-    return JSON.parse(text)
-  }
-
   since(days: number): Date {
     const ttl = days * 24 * 60 * 60 * 1000
 

@@ -16,7 +16,7 @@ async function run(): Promise<void> {
     } else if (eventName === 'issues') {
       noResponse.removeLabels()
     } else {
-      core.error(`Unrecognized event: ${eventName} test`)
+      core.error(`Unrecognized event: ${eventName}`)
     }
   } catch (error: any) {
     core.setFailed(error.message)
