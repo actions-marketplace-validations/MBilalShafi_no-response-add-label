@@ -148,7 +148,7 @@ export default class NoResponse {
       await this.octokit.rest.issues.createComment({ body: closeComment, ...issue })
     }
 
-    await this.octokit.rest.issues.update({ state: 'closed', ...issue })
+    await this.octokit.rest.issues.update({ state: 'closed', state_reason: 'inactivity', ...issue })
   }
 
   async ensureLabelExists(name: string, color: string): Promise<void> {
